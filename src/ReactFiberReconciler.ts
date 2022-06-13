@@ -1,11 +1,12 @@
 import { createFiber, Fiber } from "./ReactFiber";
-import { isArray, isStringOrNumber } from "./utils";
+import { isArray, isStringOrNumber, updateNode } from "./utils";
 
 export function updateHostComponent(workInProgress: Fiber) {
 	if (!workInProgress.stateNode) {
 		const element = document.createElement(workInProgress.type)
 
 		workInProgress.stateNode = element
+		updateNode(element, workInProgress.props)
 	}
 
 	reconcileChildren(workInProgress, workInProgress.props.children)

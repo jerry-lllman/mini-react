@@ -66,6 +66,7 @@ function performUnitOfWork() {
 
 function workLoop(IdleDeadLine: IdleDeadline) {
 	while(workInProgress && IdleDeadLine.timeRemaining() > 0) {
+		// 处理成 fiber，挂载 stateNode props 等操作
 		performUnitOfWork()
 	}
 

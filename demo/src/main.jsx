@@ -4,8 +4,8 @@ import './index.css'
 
 const jsx = (
   <div className="App" id="jsx">
-    <h1>react</h1>
-    <span>学习</span>
+    <h1 className="h1">react</h1>
+    <span className="span">学习</span>
   </div>
 )
 

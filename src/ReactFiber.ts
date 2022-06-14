@@ -1,6 +1,6 @@
 import { Flags, NoFlags, Placement } from "./ReactFiberFlags"
 import { RefObject } from "./ReactTypes"
-import { FunctionComponent, HostComponent, WorkTag } from "./ReactWorkTags"
+import { ClassComponent, FunctionComponent, HostComponent, WorkTag } from "./ReactWorkTags"
 import { isFn, isStr } from "./utils"
 
 export interface Fiber {
@@ -82,8 +82,9 @@ export function createFiber(vnode, returnFiber) {
 	if (isStr(type)) {
 		fiber.tag = HostComponent
 	} else if (isFn(type)) {
-		// 函数组件以及类组件都会被判断为 function，但暂不做处理
-		fiber.tag = FunctionComponent
+		// 函数组件以及类组件都会被判断为 function
+		// 根据判断原型上是否有 isReactComponent 来判断出是 class 还是 function 的类型（isReactComponent 来自于 React.Component ）
+		fiber.tag = (type as Function).prototype.isReactComponent ? ClassComponent : FunctionComponent
 	}
 
 	return fiber

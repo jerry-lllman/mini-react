@@ -1,14 +1,14 @@
-import { ReactDOM } from '../which-react'
+import { Component, ReactDOM } from '../which-react'
 import './index.css'
 
-// class ClassComp extends React.Component {
+class ClassComp extends Component {
 
-//   render() {
-//     return (
-//       <div></div>
-//     )
-//   }
-// }
+  render() {
+    return (
+      <div>ClassComp</div>
+    )
+  }
+}
 
 function FunctionComponent(props) {
   return (
@@ -23,6 +23,7 @@ const jsx = (
     <h1 className="h1">react</h1>
     <span className="span">学习</span>
     <FunctionComponent name="functionName" />
+    <ClassComp />
   </div>
 )
 

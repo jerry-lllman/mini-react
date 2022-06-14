@@ -15,13 +15,26 @@ export function updateHostComponent(workInProgress: Fiber) {
 	reconcileChildren(workInProgress, workInProgress.props.children)
 }
 
+
+/**
+ * 
+ * @param workInProgress
+ */
 export function updateFunctionComponent(workInProgress: Fiber) { 
 	const { type, props } = workInProgress
 	const children = type(props)
 	reconcileChildren(workInProgress, children)
 }
 
-export function updateClassComponent(workInProgress: Fiber) { }
+
+export function updateClassComponent(workInProgress: Fiber) {
+	const { type, props } = workInProgress
+	const instance = new type(props)
+	// class 的 children 来自于 render 函数
+	const children = instance.render()
+	reconcileChildren(workInProgress, children)
+}
+
 
 export function updateHostTextComponent(workInProgress: Fiber) { }
 

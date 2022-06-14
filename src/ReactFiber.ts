@@ -22,6 +22,7 @@ export interface Fiber {
 	child: Fiber | null,
 	// 存储 fiber 的兄弟 fiber
 	sibling: Fiber | null,
+	// 当前节点在父节点中的下标（可以用来判断是否发生了移动）
 	index: number,
 
 	// ref:
@@ -66,9 +67,12 @@ export function createFiber(vnode, returnFiber) {
 		child: null,
 		// 下一个兄弟 fiber
 		return: returnFiber,
-
+		// 标记（这里先默认标记为 Placement）
 		flags: Placement,
 
+		alternate: null,
+		// 要删除的节点，null 或 []
+		deletions: null,
 		// 当前 fiber 所在的层级的 index
 		index: null,
 	}
@@ -78,7 +82,7 @@ export function createFiber(vnode, returnFiber) {
 	if (isStr(type)) {
 		fiber.tag = HostComponent
 	} else if (isFn(type)) {
-		// 函数组件以及类组件
+		// 函数组件以及类组件都会被判断为 function，但暂不做处理
 		fiber.tag = FunctionComponent
 	}
 

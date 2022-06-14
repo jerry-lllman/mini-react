@@ -47,6 +47,7 @@ function performUnitOfWork() {
 	// todo 2. 更新子组件（深度优先遍历）
 	const child = workInProgress.child;
 	if (child) {
+		// 处理子节点
 		workInProgress = child;
 		return
 	}
@@ -71,6 +72,8 @@ function workLoop(IdleDeadLine: IdleDeadline) {
 	}
 
 	if (!workInProgress && workInProgressRoot) {
+		// workInProgress === null 且 workInProgressRoot 存在说明所有的 fiber 都处理完了
+		// 需要更新到页面上
 		commitRoot()
 	}
 }
@@ -81,6 +84,7 @@ requestIdleCallback(workLoop)
 // 提交
 function commitRoot() {
 	commitWorker(workInProgressRoot)
+	// 提交完以后需要清空 workInProgressRoot 防止重复提交
 	workInProgressRoot = null
 }
 

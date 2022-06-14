@@ -15,7 +15,11 @@ export function updateHostComponent(workInProgress: Fiber) {
 	reconcileChildren(workInProgress, workInProgress.props.children)
 }
 
-export function updateFunctionComponent(workInProgress: Fiber) { }
+export function updateFunctionComponent(workInProgress: Fiber) { 
+	const { type, props } = workInProgress
+	const children = type(props)
+	reconcileChildren(workInProgress, children)
+}
 
 export function updateClassComponent(workInProgress: Fiber) { }
 
@@ -39,7 +43,7 @@ function reconcileChildren(workInProgress: Fiber, children) {
 			// 会遇到 null 的节点，直接忽略即可
 			continue
 		}
-		
+
 		const newFiber = createFiber(newChild, workInProgress)
 
 		if (previousNewFiber === null) {

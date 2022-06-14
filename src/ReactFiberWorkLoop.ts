@@ -94,7 +94,8 @@ function commitWorker(workInProgress: Fiber) {
 	if (!workInProgress) return
 	// 1. 提交自己
 
-	const parentNode = workInProgress.return.stateNode
+	let parentNode = getParentNode(workInProgress.return)
+
 	const { flags, stateNode } = workInProgress
 	if (flags & Placement && stateNode) {
 		parentNode.appendChild(stateNode)
@@ -104,4 +105,14 @@ function commitWorker(workInProgress: Fiber) {
 	commitWorker(workInProgress.child)
 	// 3. 提交兄弟节点
 	commitWorker(workInProgress.sibling)
+}
+
+// 函数组件等 是没有stateNode，所以要往上找真正的 dom 节点
+function getParentNode(fiber: Fiber) {
+	let stateNode = fiber.stateNode
+	while(!stateNode) {
+		fiber = fiber.return
+		stateNode = fiber.stateNode
+	}
+	return stateNode
 }

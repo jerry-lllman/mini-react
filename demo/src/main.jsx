@@ -1,4 +1,4 @@
-import { Component, ReactDOM } from '../which-react'
+import { Component, Fragment, ReactDOM } from '../which-react'
 import './index.css'
 
 class ClassComp extends Component {
@@ -18,6 +18,21 @@ function FunctionComponent(props) {
   )
 }
 
+function FragmentComponent() {
+  return (
+    <Fragment>
+      <div>gragment1</div>
+      <div>gragment2</div>
+      <>
+        <ul>
+          <li>1</li>
+          <li>2</li>
+        </ul>
+      </>
+    </Fragment>
+  )
+}
+
 const jsx = (
   <div className="App" id="jsx">
     <h1 className="h1">react</h1>
@@ -25,6 +40,7 @@ const jsx = (
     <FunctionComponent name="functionName" />
     <ClassComp />
     文本组件
+    <FragmentComponent />
   </div>
 )
 

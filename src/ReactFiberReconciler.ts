@@ -20,7 +20,7 @@ export function updateHostComponent(workInProgress: Fiber) {
  * 
  * @param workInProgress
  */
-export function updateFunctionComponent(workInProgress: Fiber) { 
+export function updateFunctionComponent(workInProgress: Fiber) {
 	const { type, props } = workInProgress
 	const children = type(props)
 	reconcileChildren(workInProgress, children)
@@ -42,7 +42,11 @@ export function updateHostTextComponent(workInProgress: Fiber) {
 	workInProgress.stateNode = document.createTextNode(props.children)
 }
 
-export function updateFragmentComponent(workInProgress: Fiber) { }
+
+export function updateFragmentComponent(workInProgress: Fiber) {
+	const { props } = workInProgress
+	reconcileChildren(workInProgress, props.children)
+}
 
 
 function reconcileChildren(workInProgress: Fiber, children) {

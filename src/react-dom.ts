@@ -10,7 +10,7 @@ class ReactDOMRoot {
 
 	// children 就是要渲染的内容（jsx对象）
 	render(children: any) {
-		console.log(children)
+		// console.log(children)
 		const root = this._internalRoot;
 		// 有了渲染内容，和根节点信息，就可以渲染了
 		updateContainer(children, root)

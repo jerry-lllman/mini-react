@@ -1,6 +1,6 @@
 import { Flags, NoFlags, Placement } from "./ReactFiberFlags"
 import { RefObject } from "./ReactTypes"
-import { ClassComponent, FunctionComponent, HostComponent, HostText, WorkTag } from "./ReactWorkTags"
+import { ClassComponent, Fragment, FunctionComponent, HostComponent, HostText, WorkTag } from "./ReactWorkTags"
 import { isFn, isStr, isUndefined } from "./utils"
 
 export interface Fiber {
@@ -90,6 +90,8 @@ export function createFiber(vnode, returnFiber) {
 		fiber.props = {
 			children: vnode
 		}
+	} else {
+		fiber.tag = Fragment
 	}
 
 	return fiber

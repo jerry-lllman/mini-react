@@ -2,4 +2,14 @@
 
 import Component from './Component'
 
-export { Component }
+interface FragmentProps {
+	key: string | number
+	children: React.ReactNode
+}
+
+function Fragment(props: FragmentProps) {
+	const { children } = props
+	return children
+}
+
+export { Component, Fragment }

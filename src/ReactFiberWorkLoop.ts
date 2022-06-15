@@ -74,6 +74,7 @@ function workLoop(IdleDeadLine: IdleDeadline) {
 	if (!workInProgress && workInProgressRoot) {
 		// workInProgress === null 且 workInProgressRoot 存在说明所有的 fiber 都处理完了
 		// 需要更新到页面上
+		console.log(workInProgressRoot)
 		commitRoot()
 	}
 }

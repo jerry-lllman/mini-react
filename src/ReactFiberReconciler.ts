@@ -36,7 +36,11 @@ export function updateClassComponent(workInProgress: Fiber) {
 }
 
 
-export function updateHostTextComponent(workInProgress: Fiber) { }
+export function updateHostTextComponent(workInProgress: Fiber) {
+	const { props } = workInProgress
+	// 创建一个文本节点放到 stateNode 上
+	workInProgress.stateNode = document.createTextNode(props.children)
+}
 
 export function updateFragmentComponent(workInProgress: Fiber) { }
 
@@ -56,7 +60,6 @@ function reconcileChildren(workInProgress: Fiber, children) {
 			// 会遇到 null 的节点，直接忽略即可
 			continue
 		}
-
 		const newFiber = createFiber(newChild, workInProgress)
 
 		if (previousNewFiber === null) {

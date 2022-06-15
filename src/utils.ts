@@ -15,6 +15,10 @@ export function isArray(arr) {
   return Array.isArray(arr);
 }
 
+export function isUndefined(value: any) {
+  return typeof value === 'undefined'
+}
+
 export function updateNode(node, nextVal) {
   Object.keys(nextVal).forEach(key => {
     if (key === 'children') {

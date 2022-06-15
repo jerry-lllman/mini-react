@@ -24,7 +24,10 @@ const jsx = (
     <span className="span">学习</span>
     <FunctionComponent name="functionName" />
     <ClassComp />
+    文本组件
   </div>
 )
+
+console.log(jsx)
 
 ReactDOM.createRoot(document.getElementById('root')).render(jsx)

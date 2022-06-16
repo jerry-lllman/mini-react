@@ -1,6 +1,6 @@
 # mini-react
 
-demo 是通过 vite 创建的一个 React 项目，业务代码会在这里运行
+demo 是通过`vite`创建的一个 React 项目，业务代码会在这里运行
 
 使用`yarn dev` 运行项目
 ```bash

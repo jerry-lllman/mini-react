@@ -5,12 +5,12 @@ type HeapNode = {
 type Heap = Array<HeapNode>
 
 // 返回堆顶元素
-function peek(heap: Heap) {
+export function peek(heap: Heap) {
 	return heap.length ? heap[0] : null
 }
 
 // 往最小堆中插入元素
-function push(heap: Heap, node: HeapNode) {
+export function push(heap: Heap, node: HeapNode) {
 	let index = heap.length
 	heap.push(node)
 	shiftUp(heap, index)
@@ -30,7 +30,7 @@ function shiftUp(heap: Heap, index: number) {
 }
 
 // 删除堆顶元素
-function pop(heap: Heap) {
+export function pop(heap: Heap) {
 	if (heap.length === 0) {
 		return null
 	}

@@ -2,6 +2,7 @@ import { Fiber } from "./ReactFiber";
 import { Placement } from "./ReactFiberFlags";
 import { updateClassComponent, updateFragmentComponent, updateFunctionComponent, updateHostComponent, updateHostTextComponent } from "./ReactFiberReconciler";
 import { ClassComponent, Fragment, FunctionComponent, HostComponent, HostText } from "./ReactWorkTags";
+import { scheduleCallback } from "./scheduler";
 
 // 当前正在处理的节点
 let workInProgress: Fiber | null = null;
@@ -10,9 +11,12 @@ let workInProgress: Fiber | null = null;
 let workInProgressRoot: Fiber | null = null;
 
 // 初次渲染和更新
-export function scheduleUpdateOnFiber(fiber) {
+export function scheduleUpdateOnFiber(fiber: Fiber) {
 	workInProgress = fiber;
 	workInProgressRoot = fiber
+
+	// 在这里进行任务调度
+	scheduleCallback(workLoop)
 }
 
 function performUnitOfWork() {
@@ -64,9 +68,8 @@ function performUnitOfWork() {
 	workInProgress = null
 }
 
-
-function workLoop(IdleDeadLine: IdleDeadline) {
-	while(workInProgress && IdleDeadLine.timeRemaining() > 0) {
+function workLoop() {
+	while(workInProgress) {
 		// 处理成 fiber，挂载 stateNode props 等操作
 		performUnitOfWork()
 	}
@@ -74,12 +77,24 @@ function workLoop(IdleDeadLine: IdleDeadline) {
 	if (!workInProgress && workInProgressRoot) {
 		// workInProgress === null 且 workInProgressRoot 存在说明所有的 fiber 都处理完了
 		// 需要更新到页面上
-		console.log(workInProgressRoot)
 		commitRoot()
 	}
 }
 
-requestIdleCallback(workLoop)
+// function workLoop(IdleDeadLine: IdleDeadline) {
+// 	while(workInProgress && IdleDeadLine.timeRemaining() > 0) {
+// 		// 处理成 fiber，挂载 stateNode props 等操作
+// 		performUnitOfWork()
+// 	}
+
+// 	if (!workInProgress && workInProgressRoot) {
+// 		// workInProgress === null 且 workInProgressRoot 存在说明所有的 fiber 都处理完了
+// 		// 需要更新到页面上
+// 		commitRoot()
+// 	}
+// }
+
+// requestIdleCallback(workLoop)
 
 
 // 提交

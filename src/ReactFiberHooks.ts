@@ -1,4 +1,5 @@
 import { Fiber } from "./ReactFiber"
+import { scheduleUpdateOnFiber } from "./ReactFiberWorkLoop"
 
 interface Hook {
 	memoizedState: any, // state
@@ -7,11 +8,6 @@ interface Hook {
 
 // 当前正在渲染的 fiber
 let currentlyRenderingFiber: Fiber | null = null
-
-// 没什么特别的意义，就是想返回一个 Fiber 类型 不让 ts 报错
-function getCurrentlyRenderingFiber() {
-	return currentlyRenderingFiber as Fiber
-}
 
 // 当前正在处理的 hook
 let workInProgressHook: Hook | null = null
@@ -23,21 +19,20 @@ export function renderWithHooks(workInProgress: Fiber) {
 }
 
 function updateWorkInProgressHook() {
-	currentlyRenderingFiber = getCurrentlyRenderingFiber()
 	let hook
 
-	const current = currentlyRenderingFiber.alternate
+	const current = (currentlyRenderingFiber as Fiber).alternate
 	// current 存在说明是 update，否则就是 mount
 	if (current) {
 		// 复用之前的 hook
-		currentlyRenderingFiber.memoizedState = current.memoizedState
+		(currentlyRenderingFiber as Fiber).memoizedState = current.memoizedState
 		// 看是否是第一个 hook
 		if (workInProgressHook) {
 			// 不是，则拿到下一个 hook，同时更新 workInProgressHook
 			workInProgressHook = hook = workInProgressHook.next
 		} else {
 			// 是第一个 hook ，拿到第一个hook
-			workInProgressHook = hook = currentlyRenderingFiber.memoizedState
+			workInProgressHook = hook = (currentlyRenderingFiber as Fiber).memoizedState
 		}
 	} else {
 		// mount 时需要新建hook
@@ -49,7 +44,7 @@ function updateWorkInProgressHook() {
 			workInProgressHook = workInProgressHook.next = hook
 		} else {
 			// 第一个 hook，将 hook 放到 fiber 的 state 上，同时更新 workInProgressHook
-			workInProgressHook = currentlyRenderingFiber.memoizedState = hook
+			workInProgressHook = (currentlyRenderingFiber as Fiber).memoizedState = hook
 		}
 	}
 	// 最终返回 hook（也就是 workInProgressHook）
@@ -57,17 +52,24 @@ function updateWorkInProgressHook() {
 }
 
 export function useReducer(reducer, initalState) {
-	currentlyRenderingFiber = getCurrentlyRenderingFiber()
 
 	const hook = updateWorkInProgressHook()
 
-	if (!currentlyRenderingFiber.alternate) {
+	if (!(currentlyRenderingFiber as Fiber).alternate) {
 		// 初次渲染
 		hook.memoizedState = initalState
 	}
 
 	const dispatch = () => {
+		// 修改状态值(将旧的state传给使用者，然后返回新的state给 hook)
+		hook.memoizedState = reducer(hook.memoizedState); // 后面有圆括号，需要加分号
+
+		// 更新之前将 currentlyRenderingFiber 设置为自己的 alternate 
+		(currentlyRenderingFiber as Fiber).alternate = { ...currentlyRenderingFiber as Fiber }
+		// 更新
+		scheduleUpdateOnFiber(currentlyRenderingFiber as Fiber)
 		console.log('useReducer dispatch log')
 	}
+	
 	return [hook.memoizedState, dispatch]
 }

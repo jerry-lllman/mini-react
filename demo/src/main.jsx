@@ -44,7 +44,7 @@ const jsx = (
     <FunctionComponent name="functionName" />
     <ClassComp />
     文本组件
-    <FragmentComponent />
+    {/* <FragmentComponent /> */}
   </div>
 )
 

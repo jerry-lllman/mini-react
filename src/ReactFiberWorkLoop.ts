@@ -106,7 +106,7 @@ function commitRoot() {
 
 
 // 深度优先遍历
-function commitWorker(workInProgress: Fiber) {
+function commitWorker(workInProgress: Fiber | null) {
 	if (!workInProgress) return
 	// 1. 提交自己
 
@@ -124,7 +124,7 @@ function commitWorker(workInProgress: Fiber) {
 }
 
 // 函数组件等 是没有stateNode，所以要往上找真正的 dom 节点
-function getParentNode(fiber: Fiber) {
+function getParentNode(fiber) {
 	let stateNode = fiber.stateNode
 	while(!stateNode) {
 		fiber = fiber.return

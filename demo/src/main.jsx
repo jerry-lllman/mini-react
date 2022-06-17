@@ -1,4 +1,4 @@
-import { Component, Fragment, ReactDOM } from '../which-react'
+import { Component, Fragment, ReactDOM, useReducer } from '../which-react'
 import './index.css'
 
 class ClassComp extends Component {
@@ -11,9 +11,13 @@ class ClassComp extends Component {
 }
 
 function FunctionComponent(props) {
+
+  const [state, dispatch] = useReducer(x => x + 1, 0)
   return (
     <div className='function'>
       <p>{props.name}</p>
+      <div>{state}</div>
+      <button onClick={dispatch} >+1</button>
     </div>
   )
 }
@@ -21,8 +25,8 @@ function FunctionComponent(props) {
 function FragmentComponent() {
   return (
     <Fragment>
-      <div>gragment1</div>
-      <div>gragment2</div>
+      <div>fragment1</div>
+      <div>fragment2</div>
       <>
         <ul>
           <li>1</li>

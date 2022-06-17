@@ -40,7 +40,7 @@ export interface Fiber {
 	// // 更新队列 （这里类型我还没写，后面补上）
 	// updateQueue: any | null,
 
-	// memoizedState: any,
+	memoizedState: any,
 
 	// dependencies: any,
 
@@ -66,6 +66,8 @@ export function createFiber(vnode, returnFiber) {
 		// 第一个子 fiber
 		child: null,
 		// 下一个兄弟 fiber
+		sibling: null,
+		// 父 fiber
 		return: returnFiber,
 		// 标记（这里先默认标记为 Placement）
 		flags: Placement,

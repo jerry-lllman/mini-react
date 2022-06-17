@@ -1,3 +1,4 @@
+import { renderWithHooks } from "./ReactFiberHooks";
 import { createFiber, Fiber } from "./ReactFiber";
 import { isArray, isStringOrNumber, updateNode } from "./utils";
 
@@ -21,6 +22,8 @@ export function updateHostComponent(workInProgress: Fiber) {
  * @param workInProgress
  */
 export function updateFunctionComponent(workInProgress: Fiber) {
+	// 更新正在处理的 fiber
+	renderWithHooks(workInProgress)
 	const { type, props } = workInProgress
 	const children = type(props)
 	reconcileChildren(workInProgress, children)
@@ -57,7 +60,7 @@ function reconcileChildren(workInProgress: Fiber, children) {
 	// 这里先将子节点都当作数组来处理
 	const newChildren: any[] = isArray(children) ? children : [children]
 	// 用于保存上个 fiber 节点
-	let previousNewFiber: Fiber = null
+	let previousNewFiber: Fiber | null = null
 	for (let i = 0; i < newChildren.length; i++) {
 		const newChild = newChildren[i]
 		if (newChild === null) {

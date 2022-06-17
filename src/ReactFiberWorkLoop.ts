@@ -1,8 +1,9 @@
 import { Fiber } from "./ReactFiber";
-import { Placement } from "./ReactFiberFlags";
+import { Placement, Update } from "./ReactFiberFlags";
 import { updateClassComponent, updateFragmentComponent, updateFunctionComponent, updateHostComponent, updateHostTextComponent } from "./ReactFiberReconciler";
 import { ClassComponent, Fragment, FunctionComponent, HostComponent, HostText } from "./ReactWorkTags";
 import { scheduleCallback } from "./scheduler";
+import { updateNode } from "./utils";
 
 // 当前正在处理的节点
 let workInProgress: Fiber | null = null;
@@ -20,7 +21,7 @@ export function scheduleUpdateOnFiber(fiber: Fiber) {
 }
 
 function performUnitOfWork() {
-	const { tag } = workInProgress
+	const { tag } = workInProgress = workInProgress as Fiber
 
 	// todo 1. 更新当前组件
 	switch (tag) {
@@ -39,11 +40,11 @@ function performUnitOfWork() {
 		case Fragment:
 			updateFragmentComponent(workInProgress);
 			break;
-		
+
 		case HostText:
 			updateHostTextComponent(workInProgress);
 			break;
-		
+
 		default:
 			break;
 	}
@@ -56,7 +57,7 @@ function performUnitOfWork() {
 		return
 	}
 
-	while(workInProgress) {
+	while (workInProgress) {
 		if (workInProgress.sibling) {
 			workInProgress = workInProgress.sibling;
 			return
@@ -69,7 +70,7 @@ function performUnitOfWork() {
 }
 
 function workLoop() {
-	while(workInProgress) {
+	while (workInProgress) {
 		// 处理成 fiber，挂载 stateNode props 等操作
 		performUnitOfWork()
 	}
@@ -106,7 +107,7 @@ function commitRoot() {
 
 
 // 深度优先遍历
-function commitWorker(workInProgress: Fiber) {
+function commitWorker(workInProgress: Fiber | null) {
 	if (!workInProgress) return
 	// 1. 提交自己
 
@@ -117,6 +118,15 @@ function commitWorker(workInProgress: Fiber) {
 		parentNode.appendChild(stateNode)
 	}
 
+	if (flags & Update && stateNode) {
+		// 更新属性
+		updateNode(
+			stateNode,
+			(workInProgress.alternate as Fiber).props, // 老的props 在 alternate 上
+			workInProgress.props // 新的props
+		)
+	}
+
 	// 2. 提交子节点
 	commitWorker(workInProgress.child)
 	// 3. 提交兄弟节点
@@ -124,9 +134,9 @@ function commitWorker(workInProgress: Fiber) {
 }
 
 // 函数组件等 是没有stateNode，所以要往上找真正的 dom 节点
-function getParentNode(fiber: Fiber) {
+function getParentNode(fiber) {
 	let stateNode = fiber.stateNode
-	while(!stateNode) {
+	while (!stateNode) {
 		fiber = fiber.return
 		stateNode = fiber.stateNode
 	}

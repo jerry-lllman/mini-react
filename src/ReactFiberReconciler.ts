@@ -1,5 +1,7 @@
+import { renderWithHooks } from "./ReactFiberHooks";
 import { createFiber, Fiber } from "./ReactFiber";
 import { isArray, isStringOrNumber, updateNode } from "./utils";
+import { Update } from "./ReactFiberFlags";
 
 // 处理原生组件
 export function updateHostComponent(workInProgress: Fiber) {
@@ -9,7 +11,7 @@ export function updateHostComponent(workInProgress: Fiber) {
 
 		workInProgress.stateNode = element
 		// 处理 props
-		updateNode(element, workInProgress.props)
+		updateNode(element, {}, workInProgress.props)
 	}
 	// 往下处理子节点，children 是 jsx 对象
 	reconcileChildren(workInProgress, workInProgress.props.children)
@@ -21,6 +23,8 @@ export function updateHostComponent(workInProgress: Fiber) {
  * @param workInProgress
  */
 export function updateFunctionComponent(workInProgress: Fiber) {
+	// 更新正在处理的 fiber
+	renderWithHooks(workInProgress)
 	const { type, props } = workInProgress
 	const children = type(props)
 	reconcileChildren(workInProgress, children)
@@ -56,8 +60,11 @@ function reconcileChildren(workInProgress: Fiber, children) {
 	}
 	// 这里先将子节点都当作数组来处理
 	const newChildren: any[] = isArray(children) ? children : [children]
+
+	// oldFiber 的头节点
+	let oldFiber = workInProgress.alternate?.child
 	// 用于保存上个 fiber 节点
-	let previousNewFiber: Fiber = null
+	let previousNewFiber: Fiber | null = null
 	for (let i = 0; i < newChildren.length; i++) {
 		const newChild = newChildren[i]
 		if (newChild === null) {
@@ -65,6 +72,22 @@ function reconcileChildren(workInProgress: Fiber, children) {
 			continue
 		}
 		const newFiber = createFiber(newChild, workInProgress)
+		// 能否复用
+		const same = sameNode(newFiber, oldFiber)
+
+		if (same) {
+			// 能复用
+			Object.assign(newFiber, {
+				stateNode: (oldFiber as Fiber).stateNode, // 复用 dom
+				alternate: oldFiber as Fiber,
+				flags: Update // 设置为 Update
+			})
+		}
+
+		if (oldFiber) {
+			// 处于for 中，oldFiber 也需要更新到下一个 fiber	
+			oldFiber = oldFiber.sibling
+		}
 
 		if (previousNewFiber === null) {
 			// 第一个子节点直接保存到 workInProgress 上
@@ -76,4 +99,12 @@ function reconcileChildren(workInProgress: Fiber, children) {
 		// 更新
 		previousNewFiber = newFiber
 	}
+}
+
+// 节点复用条件
+// 1. 同层级
+// 2. type 相同
+// 3. key 相同
+function sameNode(a, b) {
+	return a && b && a.type === b.type && a.key === b.key
 }

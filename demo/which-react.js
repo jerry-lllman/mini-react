@@ -1,11 +1,12 @@
-// import React, { Component } from 'react';
-// import ReactDOM from 'react-dom';
+// import { Component, Fragment, useReducer } from 'react';
+// import ReactDOM from 'react-dom/client';
 
-import { Component, Fragment } from '../src/react';
+import { Component, Fragment, useReducer } from '../src/react';
 import ReactDOM from '../src/react-dom';
 
 export {
 	Component,
 	Fragment,
-	ReactDOM
+	ReactDOM,
+	useReducer
 }

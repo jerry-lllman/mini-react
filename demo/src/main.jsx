@@ -42,8 +42,8 @@ const jsx = (
     <h1 className="h1">react</h1>
     <span className="span">学习</span>
     <FunctionComponent name="functionName" />
-    <ClassComp />
-    文本组件
+    {/* <ClassComp />
+    文本组件 */}
     {/* <FragmentComponent /> */}
   </div>
 )

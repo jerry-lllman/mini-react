@@ -8,7 +8,7 @@ export interface Fiber {
 	tag: WorkTag,
 	key: null | string,
 	// element.type的值，用于在调和这个孩子的过程中保存身份。
-	elementType: any,
+	// elementType: any,
 	// 保存这个 fiber 的组件类型
 	// 比如原生组件 div、button、span 等等这种字符串。是类组件 或者是函数组件时就是对应的类或函数 等等
 	type: any,
@@ -23,7 +23,7 @@ export interface Fiber {
 	// 存储 fiber 的兄弟 fiber
 	sibling: Fiber | null,
 	// 当前节点在父节点中的下标（可以用来判断是否发生了移动）
-	index: number,
+	index: number | null, // 暂时允许 null
 
 	// ref:
 	// 	| null
@@ -96,5 +96,5 @@ export function createFiber(vnode, returnFiber) {
 		fiber.tag = Fragment
 	}
 
-	return fiber
+	return fiber as Fiber
 }

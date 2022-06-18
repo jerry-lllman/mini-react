@@ -60,16 +60,24 @@ export function useReducer(reducer, initalState) {
 		hook.memoizedState = initalState
 	}
 
-	const dispatch = () => {
-		// 修改状态值(将旧的state传给使用者，然后返回新的state给 hook)
-		hook.memoizedState = reducer(hook.memoizedState); // 后面有圆括号，需要加分号
+	// 因为 currentlyRenderingFiber 是全局变量，可能会导致存储的 fiber 不是需要更新 state 的 fiber
+	// 所以需要通过 bind 在 dispatchReducerAction 这个函数内存储住相关信息（fiber 等），在调用时能获取到正确数据
+	const dispatch = dispatchReducerAction.bind(
+		null,
+		currentlyRenderingFiber,
+		hook,
+		reducer
+	)
 
-		// 更新之前将 currentlyRenderingFiber 设置为自己的 alternate 
-		(currentlyRenderingFiber as Fiber).alternate = { ...currentlyRenderingFiber as Fiber }
-		// 更新
-		scheduleUpdateOnFiber(currentlyRenderingFiber as Fiber)
-		console.log('useReducer dispatch log')
-	}
-	
 	return [hook.memoizedState, dispatch]
+}
+
+function dispatchReducerAction(fiber: Fiber, hook: Hook, reducer, action) {
+	hook.memoizedState = reducer(hook.memoizedState); // 后面有圆括号，需要加分号
+	// 更新之前将 currentlyRenderingFiber 设置为自己的 alternate 
+	fiber.alternate = { ...fiber }
+	// 因为我们只更新这一个 fiber 组件，不能影响其他组件，所以需要将 sibling 设置为 null，避免后续组件被重复渲染
+	fiber.sibling = null
+	// 更新当前 fiber
+	scheduleUpdateOnFiber(fiber)
 }

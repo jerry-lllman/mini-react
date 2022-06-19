@@ -1,6 +1,6 @@
 
 import Component from './Component'
-import { useReducer } from './ReactFiberHooks'
+import { useReducer, useState } from './ReactFiberHooks'
 interface FragmentProps {
 	key: string | number
 	children: React.ReactNode
@@ -11,4 +11,4 @@ function Fragment(props: FragmentProps) {
 	return children
 }
 
-export { Component, Fragment, useReducer }
+export { Component, Fragment, useReducer, useState }

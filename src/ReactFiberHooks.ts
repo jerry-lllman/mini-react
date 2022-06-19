@@ -51,7 +51,7 @@ function updateWorkInProgressHook() {
 	return hook
 }
 
-export function useReducer(reducer, initalState) {
+export function useReducer(reducer, initalState ) {
 
 	const hook = updateWorkInProgressHook()
 
@@ -73,11 +73,17 @@ export function useReducer(reducer, initalState) {
 }
 
 function dispatchReducerAction(fiber: Fiber, hook: Hook, reducer, action) {
-	hook.memoizedState = reducer(hook.memoizedState); // 后面有圆括号，需要加分号
+	// reducer 存在，则说明时 useReducer，否则就是 setState
+	// 是 setState 时，直接将调用 dispatch 时传入的参数（action）赋值给 memoizedState 即可
+	hook.memoizedState = reducer ? reducer(hook.memoizedState, action) : action;
 	// 更新之前将 currentlyRenderingFiber 设置为自己的 alternate 
 	fiber.alternate = { ...fiber }
 	// 因为我们只更新这一个 fiber 组件，不能影响其他组件，所以需要将 sibling 设置为 null，避免后续组件被重复渲染
 	fiber.sibling = null
 	// 更新当前 fiber
 	scheduleUpdateOnFiber(fiber)
+}
+
+export function useState(initalState) {
+	return useReducer(null, initalState)
 }

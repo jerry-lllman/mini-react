@@ -1,4 +1,4 @@
-import { Component, Fragment, ReactDOM, useReducer } from '../which-react'
+import { Component, Fragment, ReactDOM, useReducer, useState } from '../which-react'
 import './index.css'
 
 class ClassComp extends Component {
@@ -10,14 +10,36 @@ class ClassComp extends Component {
   }
 }
 
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return { count: state.count + 1 };
+    case 'decrement':
+      return { count: state.count - 1 };
+    default:
+      throw new Error();
+  }
+}
+
 function FunctionComponent(props) {
 
   const [state, dispatch] = useReducer(x => x + 1, 0)
+
+  const [count, setCount] = useState(0)
+
+  const [data, setData] = useReducer(reducer, { count: 0 })
+
   return (
     <div className='function'>
       <p>{props.name}</p>
       <div>{state}</div>
       <button onClick={dispatch} >+1</button>
+      <div>{count}</div>
+      <button onClick={() => setCount(count + 2)} >+2</button>
+
+      <div>{ data.count }</div>
+      <button onClick={ () => setData({ type: 'increment' }) }>data.count + 1</button>
+      <button onClick={ () => setData({ type: 'decrement' }) }>data.count - 1</button>
     </div>
   )
 }

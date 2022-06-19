@@ -19,4 +19,4 @@ src 目录是 mini-react 代码
 1. `scheduler`（调度）模块（暂时还不支持优先级～）
 
 ## v0.0.3
-1. 实现useReducer
+1. 实现 useReducer、useState

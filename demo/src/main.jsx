@@ -23,17 +23,27 @@ function reducer(state, action) {
 
 function FunctionComponent(props) {
 
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(4)
 
+  const handler = () => {
+    if (count === 0) {
+      setCount(4)
+    } else {
+      setCount(count - 2)
+    }
+  }
 
   return (
     <div className='function'>
       <p>{props.name}</p>
       <div>
-        <button onClick={() => setCount(count + 1)}>count值 + 1</button>
+        <button onClick={handler}>{count}</button>
+        <ul>
+          {
+            [0, 1, 2, 3, 4].map(item => count >= item ? <li key={item}>{item}</li> : null)
+          }
+        </ul>
       </div>
-      <div>{count}</div>
-      {count % 2 ? <div>学习React</div> : <span>学习算法</span>}
     </div>
   )
 }

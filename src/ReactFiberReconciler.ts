@@ -52,6 +52,13 @@ export function updateFragmentComponent(workInProgress: Fiber) {
 	reconcileChildren(workInProgress, props.children)
 }
 
+function deleteChild(returnFiber: Fiber, childToDelete: Fiber) {
+	if (returnFiber.deletions) {
+		returnFiber.deletions.push(childToDelete)
+	} else {
+		returnFiber.deletions = [childToDelete]
+	}
+}
 
 function reconcileChildren(workInProgress: Fiber, children) {
 	if (isStringOrNumber(children)) {
@@ -82,6 +89,10 @@ function reconcileChildren(workInProgress: Fiber, children) {
 				alternate: oldFiber as Fiber,
 				flags: Update // 设置为 Update
 			})
+		}
+
+		if (!same && oldFiber) {
+			deleteChild(workInProgress, oldFiber)
 		}
 
 		if (oldFiber) {

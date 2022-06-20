@@ -127,6 +127,10 @@ function commitWorker(workInProgress: Fiber | null) {
 		)
 	}
 
+	if (workInProgress.deletions) {
+		commitDeletions(workInProgress.deletions, stateNode || parentNode)
+	}
+
 	// 2. 提交子节点
 	commitWorker(workInProgress.child)
 	// 3. 提交兄弟节点
@@ -141,4 +145,21 @@ function getParentNode(fiber) {
 		stateNode = fiber.stateNode
 	}
 	return stateNode
+}
+
+function commitDeletions(deletions: Fiber[], parentNode: HTMLElement) {
+	for(let i = 0; i < deletions.length; i++) {
+		parentNode.removeChild(getStateNode(deletions[i]))
+	}
+}
+
+
+// function组件 或 fragment组件需要往下找原生组件
+function getStateNode(fiber: Fiber) {
+	let temp: Fiber | null = fiber
+
+	while(!temp?.stateNode) {
+		temp = temp?.child || null
+	}
+	return temp.stateNode
 }

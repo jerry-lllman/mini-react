@@ -23,23 +23,27 @@ function reducer(state, action) {
 
 function FunctionComponent(props) {
 
-  const [state, dispatch] = useReducer(x => x + 1, 0)
+  const [count, setCount] = useState(4)
 
-  const [count, setCount] = useState(0)
-
-  const [data, setData] = useReducer(reducer, { count: 0 })
+  const handler = () => {
+    if (count === 0) {
+      setCount(4)
+    } else {
+      setCount(count - 2)
+    }
+  }
 
   return (
     <div className='function'>
       <p>{props.name}</p>
-      <div>{state}</div>
-      <button onClick={dispatch} >+1</button>
-      <div>{count}</div>
-      <button onClick={() => setCount(count + 2)} >+2</button>
-
-      <div>{ data.count }</div>
-      <button onClick={ () => setData({ type: 'increment' }) }>data.count + 1</button>
-      <button onClick={ () => setData({ type: 'decrement' }) }>data.count - 1</button>
+      <div>
+        <button onClick={handler}>{count}</button>
+        <ul>
+          {
+            [0, 1, 2, 3, 4].map(item => count >= item ? <li key={item}>{item}</li> : null)
+          }
+        </ul>
+      </div>
     </div>
   )
 }

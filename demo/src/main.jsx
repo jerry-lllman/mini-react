@@ -23,24 +23,16 @@ function reducer(state, action) {
 
 function FunctionComponent(props) {
 
-  const [count, setCount] = useState(4)
-
-  const handler = () => {
-    if (count === 0) {
-      setCount(4)
-    } else {
-      setCount(count - 2)
-    }
-  }
+  const [count, setCount] = useState(0)
 
   return (
     <div className='function'>
       <p>{props.name}</p>
       <div>
-        <button onClick={handler}>{count}</button>
+        <button onClick={() => setCount(count + 1)}>{count}</button>
         <ul>
           {
-            [0, 1, 2, 3, 4].map(item => count >= item ? <li key={item}>{item}</li> : null)
+            (count % 2 ? [0, 1, 3, 4] : [0, 1, 2, 3, 4]).map(item => <li key={item}>{item}</li>)
           }
         </ul>
       </div>

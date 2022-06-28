@@ -1,7 +1,7 @@
 import { renderWithHooks } from "./ReactFiberHooks";
 import { Fiber } from "./ReactFiber";
 import { updateNode } from "./utils";
-import { reconcileChildren } from "./ReactChildFIber";
+import { reconcileChildren } from "./ReactChildFiber";
 
 // 处理原生组件
 export function updateHostComponent(workInProgress: Fiber) {

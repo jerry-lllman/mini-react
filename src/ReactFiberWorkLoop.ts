@@ -100,6 +100,7 @@ function workLoop() {
 
 // 提交
 function commitRoot() {
+	console.log(workInProgressRoot)
 	commitWorker(workInProgressRoot)
 	// 提交完以后需要清空 workInProgressRoot 防止重复提交
 	workInProgressRoot = null
@@ -115,7 +116,11 @@ function commitWorker(workInProgress: Fiber | null) {
 
 	const { flags, stateNode } = workInProgress
 	if (flags & Placement && stateNode) {
-		parentNode.appendChild(stateNode)
+		// 有可能是移动（插入）节点，也有可能是新增节点
+		// 对于移动节点，我们可以利用 insertBefore 插入
+		const before = getHostSibling(workInProgress.sibling)
+		insertOrAppendPlacementNode(workInProgress, before, parentNode)
+		// parentNode.appendChild(stateNode)
 	}
 
 	if (flags & Update && stateNode) {
@@ -148,7 +153,7 @@ function getParentNode(fiber) {
 }
 
 function commitDeletions(deletions: Fiber[], parentNode: HTMLElement) {
-	for(let i = 0; i < deletions.length; i++) {
+	for (let i = 0; i < deletions.length; i++) {
 		parentNode.removeChild(getStateNode(deletions[i]))
 	}
 }
@@ -158,8 +163,31 @@ function commitDeletions(deletions: Fiber[], parentNode: HTMLElement) {
 function getStateNode(fiber: Fiber) {
 	let temp: Fiber | null = fiber
 
-	while(!temp?.stateNode) {
+	while (!temp?.stateNode) {
 		temp = temp?.child || null
 	}
 	return temp.stateNode
+}
+
+function getHostSibling(fiber: Fiber | null) {
+	while (fiber) {
+		// sibling.stateNode 存在，并且 sibling 需要添加到页面上，则说明这是一个 dom 节点
+		if (fiber.stateNode && !(fiber.flags & Placement)) {
+			return fiber.stateNode
+		}
+		fiber = fiber.sibling
+	}
+	return null
+}
+
+function insertOrAppendPlacementNode(
+	node: Fiber,
+	before: HTMLElement | null,
+	parent: HTMLElement
+) {
+	if (before) {
+		parent.insertBefore(node.stateNode, before)
+	} else {
+		parent.appendChild(node.stateNode)
+	}
 }

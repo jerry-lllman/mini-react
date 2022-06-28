@@ -32,7 +32,7 @@ function FunctionComponent(props) {
         <button onClick={() => setCount(count + 1)}>{count}</button>
         <ul>
           {
-            (count % 2 ? [0, 1, 3, 4] : [0, 1, 2, 3, 4]).map(item => <li key={item}>{item}</li>)
+            (count % 2 ? [2, 1, 3, 4] : [0, 1, 2, 3, 4]).map(item => <li key={item}>{item}</li>)
           }
         </ul>
       </div>

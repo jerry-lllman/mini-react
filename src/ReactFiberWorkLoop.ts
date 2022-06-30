@@ -136,6 +136,10 @@ function commitWorker(workInProgress: Fiber | null) {
 		commitDeletions(workInProgress.deletions, stateNode || parentNode)
 	}
 
+	if (workInProgress.tag === FunctionComponent) {
+		invokeHooks(workInProgress)
+	}
+
 	// 2. 提交子节点
 	commitWorker(workInProgress.child)
 	// 3. 提交兄弟节点
@@ -190,4 +194,17 @@ function insertOrAppendPlacementNode(
 	} else {
 		parent.appendChild(node.stateNode)
 	}
+}
+
+function invokeHooks(workInProgress: Fiber) {
+	const { updateQueueOfEffect, updateQueueOfLayout } = workInProgress
+
+	updateQueueOfLayout.forEach(item => {
+		const { create } = item
+		create()
+	})
+	updateQueueOfEffect.forEach(item => {
+		const { create } = item
+		create()
+	})
 }

@@ -1,5 +1,6 @@
 import { Fiber } from "./ReactFiber"
 import { scheduleUpdateOnFiber } from "./ReactFiberWorkLoop"
+import { HookLayout, HookPassive } from "./ReactHookEffectTags"
 
 interface Hook {
 	memoizedState: any, // state
@@ -16,6 +17,11 @@ export function renderWithHooks(workInProgress: Fiber) {
 	currentlyRenderingFiber = workInProgress
 	currentlyRenderingFiber.memoizedState = null
 	workInProgressHook = null
+
+	// 源码中是放到一个链表上 updateQueue
+	// 这里简单处理，用数组分开存储
+	currentlyRenderingFiber.updateQueueOfEffect = []
+	currentlyRenderingFiber.updateQueueOfLayout = []
 }
 
 function updateWorkInProgressHook() {
@@ -51,6 +57,7 @@ function updateWorkInProgressHook() {
 	return hook
 }
 
+
 export function useReducer(reducer, initalState ) {
 
 	const hook = updateWorkInProgressHook()
@@ -84,6 +91,35 @@ function dispatchReducerAction(fiber: Fiber, hook: Hook, reducer, action) {
 	scheduleUpdateOnFiber(fiber)
 }
 
-export function useState(initalState) {
+export function useState<S>(initalState: S | (() => S)) {
 	return useReducer(null, initalState)
+}
+
+
+type Destructor = () => void
+type EffectCallback = () => (void | Destructor)
+
+function updateEffectImpl(hooksFlags, create, deps) {
+	const hook = updateWorkInProgressHook()
+
+	const effect = { hooksFlags, create, deps }
+
+	hook.memoizedState = effect
+	if (hooksFlags & HookPassive) {
+		currentlyRenderingFiber?.updateQueueOfEffect.push(effect)
+	} else if (hooksFlags & HookLayout) {
+		currentlyRenderingFiber?.updateQueueOfLayout.push(effect)
+	}
+
+}
+
+export function useEffect(create: EffectCallback, deps?: ReadonlyArray<unknown>) {
+
+	return updateEffectImpl(HookPassive, create, deps)
+}
+
+
+export function useLayoutEffect(create: EffectCallback, deps?: ReadonlyArray<unknown>) {
+
+	return updateEffectImpl(HookLayout, create, deps)
 }

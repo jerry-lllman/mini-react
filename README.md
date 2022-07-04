@@ -34,3 +34,11 @@ demo 是通过`vite`创建的一个 React 项目，业务代码会在这里运�
 ### v0.0.4
 1. 节点的删除与更新
 2. 多节点删除
+
+### v0.0.5
+1. vdom diff
+2. 节点与dom的复用
+
+### v0.0.6
+1. 实现 useEffect
+2. 实现 useLayoutEffect

@@ -1,7 +1,7 @@
 // import { Component, Fragment, useReducer } from 'react';
 // import ReactDOM from 'react-dom/client';
 
-import { Component, Fragment, useReducer, useState } from '../src/react';
+import { Component, Fragment, useReducer, useState, useEffect, useLayoutEffect } from '../src/react';
 import ReactDOM from '../src/react-dom';
 
 export {
@@ -9,5 +9,7 @@ export {
 	Fragment,
 	ReactDOM,
 	useReducer,
-	useState
+	useState,
+	useEffect,
+	useLayoutEffect
 }

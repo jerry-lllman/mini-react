@@ -53,6 +53,8 @@ export interface Fiber {
 	lastEffect: Fiber | null,
 
 	alternate: Fiber | null,
+	updateQueueOfEffect: any[]
+	updateQueueOfLayout: any[]
 }
 
 export function createFiber(vnode, returnFiber) {

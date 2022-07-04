@@ -1,6 +1,6 @@
-import { Component, Fragment, ReactDOM, useReducer, useState } from '../which-react'
+import { Component, Fragment, ReactDOM, useReducer, useState, useEffect, useLayoutEffect } from '../which-react'
 import './index.css'
-
+import React from 'react'
 class ClassComp extends Component {
 
   render() {
@@ -24,6 +24,15 @@ function reducer(state, action) {
 function FunctionComponent(props) {
 
   const [count, setCount] = useState(0)
+
+  useEffect(() => {
+
+    console.log('useEffect', count)
+  }, [count])
+
+  useLayoutEffect(() => {
+    console.log('useLayoutEffect')
+  }, [])
 
   return (
     <div className='function'>

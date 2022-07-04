@@ -100,7 +100,7 @@ function workLoop() {
 
 // 提交
 function commitRoot() {
-	console.log(workInProgressRoot)
+	// console.log(workInProgressRoot)
 	commitWorker(workInProgressRoot)
 	// 提交完以后需要清空 workInProgressRoot 防止重复提交
 	workInProgressRoot = null
@@ -199,12 +199,17 @@ function insertOrAppendPlacementNode(
 function invokeHooks(workInProgress: Fiber) {
 	const { updateQueueOfEffect, updateQueueOfLayout } = workInProgress
 
+	// useLayoutEffect 直接执行
 	updateQueueOfLayout.forEach(item => {
 		const { create } = item
 		create()
 	})
+	
+	// useEffect 的 callback 需要更新以后才执行，所以需要放到 scheduler 中（异步调用）
 	updateQueueOfEffect.forEach(item => {
 		const { create } = item
-		create()
+		scheduleCallback(() => {
+			create()
+		})
 	})
 }

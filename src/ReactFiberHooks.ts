@@ -13,6 +13,9 @@ let currentlyRenderingFiber: Fiber | null = null
 // 当前正在处理的 hook
 let workInProgressHook: Hook | null = null
 
+// old hook
+let currentHook: Hook | null = null
+
 export function renderWithHooks(workInProgress: Fiber) {
 	currentlyRenderingFiber = workInProgress
 	currentlyRenderingFiber.memoizedState = null
@@ -36,11 +39,22 @@ function updateWorkInProgressHook() {
 		if (workInProgressHook) {
 			// 不是，则拿到下一个 hook，同时更新 workInProgressHook
 			workInProgressHook = hook = workInProgressHook.next
+
+			// old hook 也需要更新到对应的 old hook
+			currentHook = (currentHook as Hook).next
 		} else {
 			// 是第一个 hook ，拿到第一个hook
 			workInProgressHook = hook = (currentlyRenderingFiber as Fiber).memoizedState
+
+			// old hook 作为 head hook
+			currentHook = current.memoizedState
 		}
 	} else {
+		// 组件初次渲染
+
+		// 初次渲染时不存在 old hook
+		currentHook = null
+
 		// mount 时需要新建hook
 		hook = {
 			memoizedState: null, // state
@@ -58,7 +72,7 @@ function updateWorkInProgressHook() {
 }
 
 
-export function useReducer(reducer, initalState ) {
+export function useReducer(reducer, initalState) {
 
 	const hook = updateWorkInProgressHook()
 
@@ -99,27 +113,61 @@ export function useState<S>(initalState: S | (() => S)) {
 type Destructor = () => void
 type EffectCallback = () => (void | Destructor)
 
-function updateEffectImpl(hooksFlags, create, deps) {
+function updateEffectImpl(hooksFlags, create, deps?: ReadonlyArray<unknown>) {
+	// 拿到当前的这个 hook
 	const hook = updateWorkInProgressHook()
+	const nextDeps = deps === undefined ? null : deps
 
-	const effect = { hooksFlags, create, deps }
+	if (currentHook) {
+		const prevEffect = currentHook.memoizedState
+		if (nextDeps !== null) {
+			const prevDeps = prevEffect.deps
+			if (areHookInputsEqual(nextDeps, prevDeps)) {
+				return
+			}
+		}
+	}
 
+	// 根据参数创建 effect
+	const effect = { hooksFlags, create, deps: nextDeps }
+	// 将 effect 作为当前这个 hook 的 state
 	hook.memoizedState = effect
+	// 同时更新到 updateQueue 上
 	if (hooksFlags & HookPassive) {
 		currentlyRenderingFiber?.updateQueueOfEffect.push(effect)
 	} else if (hooksFlags & HookLayout) {
 		currentlyRenderingFiber?.updateQueueOfLayout.push(effect)
 	}
-
 }
 
 export function useEffect(create: EffectCallback, deps?: ReadonlyArray<unknown>) {
-
 	return updateEffectImpl(HookPassive, create, deps)
 }
 
 
 export function useLayoutEffect(create: EffectCallback, deps?: ReadonlyArray<unknown>) {
-
 	return updateEffectImpl(HookLayout, create, deps)
+}
+
+
+/**
+ * @
+ * @param nextDeps 
+ * @param prevDeps 
+ * @returns 
+ */
+function areHookInputsEqual(nextDeps: ReadonlyArray<unknown>, prevDeps: ReadonlyArray<unknown> | null) {
+	// 不存在依赖项，返回 falsy
+	if (prevDeps === null) return false
+
+	for (let i = 0; i < prevDeps.length && i < nextDeps.length; i++) {
+		if (Object.is(nextDeps[i], prevDeps[i])) {
+			// 依赖项一致，检查下一个
+			continue
+		}
+		// 某一项不一致，则返回 false
+		return false
+	}
+	// 依赖项一致
+	return true
 }

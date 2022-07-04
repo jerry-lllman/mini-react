@@ -1,6 +1,6 @@
 import { Component, Fragment, ReactDOM, useReducer, useState, useEffect, useLayoutEffect } from '../which-react'
 import './index.css'
-
+import React from 'react'
 class ClassComp extends Component {
 
   render() {
@@ -27,8 +27,8 @@ function FunctionComponent(props) {
 
   useEffect(() => {
 
-    console.log('useEffect')
-  }, [])
+    console.log('useEffect', count)
+  }, [count])
 
   useLayoutEffect(() => {
     console.log('useLayoutEffect')
